@@ -73,8 +73,15 @@ $handler->destroy("cookie_name", "/cookie_path", "cookie_domain"); // Delete the
 $handler->destroy("cookie_name", "/cookie_path", "cookie_domain", true); // Let the cookie be deleted at the end of the `Cookie` lifecycle
 ```
 
-## Tests
+### Install
 
-```php
+```bash
+$ cd php-http
+$ composer install
+```
+
+### Tests
+
+```bash
 $ phpunit tests/Http/Cookie/CookieTest.php --stderr
 ```
