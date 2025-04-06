@@ -11,17 +11,11 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class Response extends SymfonyResponse
 {
-
-    /**
-     * @var SymfonyResponse
-     */
-    private $response;
-
     /**
      * Create a new HTTP response.
      *
      * @param  mixed  $content
-     * @param int $status
+     * @param  int $status
      * @param  array  $headers
      * @return void
      *
@@ -29,7 +23,7 @@ class Response extends SymfonyResponse
      */
     public function __construct($content = '', int $status = 200, array $headers = [])
     {
-        $this->response = parent::__construct($content, $status, $headers);
+        parent::__construct($content, $status, $headers);
         $this->headers = new ResponseHeaderBag($headers);
 
         $this->setContent($content);
@@ -45,7 +39,7 @@ class Response extends SymfonyResponse
      *
      * @throws \InvalidArgumentException
      */
-    public function setContent($content)
+    public function setContent($content): Response
     {
         // If the content is "JSONable" we will set the appropriate header and convert
         // the content to JSON. This is useful when returning something like models
@@ -72,7 +66,7 @@ class Response extends SymfonyResponse
             $content = $content();
         }
 
-        $this->response->setContent($content);
+        parent::setContent($content);
 
         return $this;
     }
