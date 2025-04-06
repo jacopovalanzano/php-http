@@ -10,6 +10,8 @@ You can send multiple cookies.
 
 Except for `name`, all attributes are optional. The SameSite `None` attribute requires the `Secure` attribute to be set.
 
+Cookies cannot have the same "name", "path" and "domain". If they do, the cookie will be overridden.
+
 * `name`: The name of the cookie. It must not be empty.
 * `value`: The value of the cookie. (?string)
 * `path`: The path of the cookie. If unset, defaults to `/`. (string)
