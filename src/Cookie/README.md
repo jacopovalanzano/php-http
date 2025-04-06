@@ -84,4 +84,5 @@ $ composer install
 
 ```bash
 $ phpunit tests/Http/Cookie/CookieTest.php --stderr
+$ phpunit tests/Http/Cookie/CookieHandlerTest.php --stderr
 ```
