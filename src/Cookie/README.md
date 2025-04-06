@@ -27,7 +27,7 @@ Cookies cannot have the same "name", "path" and "domain". If they do, the cookie
 
 Create a new cookie:
 ```php
-$cookie = new Cookie("cookie_name", "cookie_value");
+$cookie = new \Tundra\Http\Cookie\Cookie("cookie_name", "cookie_value");
 ```
 
 Cookies should be created and managed using the `CookieHandler` class:
