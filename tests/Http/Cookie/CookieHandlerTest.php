@@ -71,6 +71,15 @@ class CookieHandlerTest extends TestCase
             "httponly" => true,
             "samesite" => "Lax"
         ], parseSetCookieHeader($handler->cookie($cookieName)->toString()));
+
+        // Test with 3 arguments
+        $this->assertEquals([
+            "name" => $cookieName,
+            "value" => $cookieValue,
+            "path" => "/",
+            "httponly" => true,
+            "samesite" => "Lax"
+        ], parseSetCookieHeader($handler->cookie($cookieName, "/", "")->toString()));
     }
 
     /**
@@ -256,7 +265,7 @@ class CookieHandlerTest extends TestCase
         $cookieValue = "my_cookie_value";
         $expires = time() + 3600; // 1 hour from now
         $path = "/";
-        $domain = "test.com";
+        $domain = "";
         $sameSite = "Lax";
         $secure = false;
         $httpOnly = true;
@@ -285,10 +294,19 @@ class CookieHandlerTest extends TestCase
             "name" => $cookieName,
             "value" => $cookieValue,
             "path" => $path,
-            "domain" => $domain,
             "expires" => gmdate("D, d M Y H:i:s T", $expires),
             "httponly" => $httpOnly,
             "samesite" => $sameSite,
         ], parseSetCookieHeader($cookieHandler->get($cookieName, $path, $domain)->toString()));
+
+        // Get the (the default way)
+        $this->assertEquals([
+            "name" => $cookieName,
+            "value" => $cookieValue,
+            "path" => $path,
+            "expires" => gmdate("D, d M Y H:i:s T", $expires),
+            "httponly" => $httpOnly,
+            "samesite" => $sameSite,
+        ], parseSetCookieHeader($cookieHandler->get($cookieName)->toString()));
     }
 }
