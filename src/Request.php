@@ -7,7 +7,9 @@ namespace Tundra\Http;
 /**
  * Class Request
  *
- * Handles HTTP request methods
+ * Handles HTTP request methods.
+ *
+ * Part of this class was forked from the Laravel 8 core.
  *
  * @package TundraCMS
  * @version 1.2.203
@@ -15,10 +17,10 @@ namespace Tundra\Http;
  */
 
 // Help opcache.preload discover always-needed symbols
-class_exists(AcceptHeader::class);
+//class_exists(AcceptHeader::class);
 class_exists(FileBag::class);
 class_exists(HeaderBag::class);
-class_exists(HeaderUtils::class);
+//class_exists(HeaderUtils::class);
 class_exists(InputBag::class);
 class_exists(ParameterBag::class);
 class_exists(ServerBag::class);
@@ -59,7 +61,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request
         self::HEADER_X_FORWARDED_HOST => 'X_FORWARDED_HOST',
         self::HEADER_X_FORWARDED_PROTO => 'X_FORWARDED_PROTO',
         self::HEADER_X_FORWARDED_PORT => 'X_FORWARDED_PORT',
-        self::HEADER_X_FORWARDED_PREFIX => 'X_FORWARDED_PREFIX',
+        //self::HEADER_X_FORWARDED_PREFIX => 'X_FORWARDED_PREFIX',
     ];
 
     /**
@@ -125,21 +127,6 @@ class Request extends \Symfony\Component\HttpFoundation\Request
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function duplicate(
-        array $query = null,
-        array $request = null,
-        array $attributes = null,
-        array $cookies = null,
-        array $files = null,
-        array $server = null
-    )
-    {
-        return $this->duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
-    }
-
-    /**
      * Sets the parameters for this request.
      *
      * This method also re-initializes all properties.
@@ -169,8 +156,8 @@ class Request extends \Symfony\Component\HttpFoundation\Request
         $this->acceptableContentTypes = null;
         $this->pathInfo = null;
         $this->requestUri = $this->getRequestUri();
-        $this->requestMethod = $this->getMethod(); 
-        $this->serverProtocol = $this->getProtocolVersion();       
+        $this->requestMethod = $this->getMethod();
+        $this->serverProtocol = $this->getProtocolVersion();
         $this->baseUrl = null;
         $this->basePath = null;
         $this->method = null;
@@ -280,62 +267,6 @@ class Request extends \Symfony\Component\HttpFoundation\Request
         return $this->requestUri;
     }
 
-    /*
-     * I've only added minor changes - Jacopo Valanzano.
-     *
-     * The following methods are derived from code of the Zend Framework (1.10dev - 2010-01-24)
-     *
-     * Code subject to the new BSD license (https://framework.zend.com/license).
-     *
-     * Copyright (c) 2005-2010 Zend Technologies USA Inc. (https://www.zend.com/)
-     */
-    protected function prepareRequestUri()
-    {
-        $requestUri = ''; // Initialize
-
-        if ('1' == $this->server->get('IIS_WasUrlRewritten') && '' != $this->server->get('UNENCODED_URL')) {
-            // IIS7 with URL Rewrite: make sure we get the unencoded URL (double slash problem)
-            $requestUri = $this->server->get('UNENCODED_URL');
-            $this->server->remove('UNENCODED_URL');
-            $this->server->remove('IIS_WasUrlRewritten');
-        } elseif ($this->server->has('REQUEST_URI')) {
-            $requestUri = $this->server->get('REQUEST_URI');
-
-            if ('' !== $requestUri && '/' === $requestUri[0]) {
-                // To only use path and query remove the fragment.
-                if (false !== $pos = \strpos($requestUri, '#')) {
-                    $requestUri = \substr($requestUri, 0, $pos);
-                }
-            } else {
-                // HTTP proxy reqs setup request URI with scheme and host [and port] + the URL path,
-                // only use URL path.
-                $uriComponents = \parse_url($requestUri);
-
-                if (isset($uriComponents['path'])) {
-                    $requestUri = $uriComponents['path'];
-                }
-
-                if (isset($uriComponents['query'])) {
-                    $requestUri .= '?' . $uriComponents['query'];
-                }
-            }
-        } elseif ($this->server->has('ORIG_PATH_INFO')) {
-            // IIS 5.0, PHP as CGI
-            $requestUri = $this->server->get('ORIG_PATH_INFO');
-            if ('' != $this->server->get('QUERY_STRING')) {
-                $requestUri .= '?' . $this->server->get('QUERY_STRING');
-            }
-            $this->server->remove('ORIG_PATH_INFO');
-        } else {
-            $requestUri = \parse_url("/" . \ltrim($_SERVER["REQUEST_URI"],"/"), \PHP_URL_PATH);
-        }
-
-        // normalize the request URI to ease creating sub-requests from this request
-        $this->server->set('REQUEST_URI', $requestUri);
-
-        return $requestUri;
-    }
-
     /**
      * Gets the request "intended" method.
      *
@@ -402,29 +333,71 @@ class Request extends \Symfony\Component\HttpFoundation\Request
         return $this->server->get('SERVER_PROTOCOL');
     }
 
+    /**
+     * I've only added minor changes - Jacopo Valanzano.
+     *
+     * The following methods are derived from code of the Zend Framework (1.10dev - 2010-01-24)
+     *
+     * Code subject to the new BSD license (https://framework.zend.com/license).
+     *
+     * Copyright (c) 2005-2010 Zend Technologies USA Inc. (https://www.zend.com/)
+     */
+    protected function prepareRequestUri()
+    {
+        $requestUri = ''; // Initialize
+
+        if ('1' == $this->server->get('IIS_WasUrlRewritten') && '' != $this->server->get('UNENCODED_URL')) {
+            // IIS7 with URL Rewrite: make sure we get the unencoded URL (double slash problem)
+            $requestUri = $this->server->get('UNENCODED_URL');
+            $this->server->remove('UNENCODED_URL');
+            $this->server->remove('IIS_WasUrlRewritten');
+        } elseif ($this->server->has('REQUEST_URI')) {
+            $requestUri = $this->server->get('REQUEST_URI');
+
+            if ('' !== $requestUri && '/' === $requestUri[0]) {
+                // To only use path and query remove the fragment.
+                if (false !== $pos = \strpos($requestUri, '#')) {
+                    $requestUri = \substr($requestUri, 0, $pos);
+                }
+            } else {
+                // HTTP proxy reqs setup request URI with scheme and host [and port] + the URL path,
+                // only use URL path.
+                $uriComponents = \parse_url($requestUri);
+
+                if (isset($uriComponents['path'])) {
+                    $requestUri = $uriComponents['path'];
+                }
+
+                if (isset($uriComponents['query'])) {
+                    $requestUri .= '?' . $uriComponents['query'];
+                }
+            }
+        } elseif ($this->server->has('ORIG_PATH_INFO')) {
+            // IIS 5.0, PHP as CGI
+            $requestUri = $this->server->get('ORIG_PATH_INFO');
+            if ('' != $this->server->get('QUERY_STRING')) {
+                $requestUri .= '?' . $this->server->get('QUERY_STRING');
+            }
+            $this->server->remove('ORIG_PATH_INFO');
+        } else {
+            $requestUri = \parse_url("/" . \ltrim($_SERVER["REQUEST_URI"] ?: $_SERVER["PHP_SELF"],"/"), \PHP_URL_PATH);
+        }
+
+        // normalize the request URI to ease creating sub-requests from this request
+        $this->server->set('REQUEST_URI', $requestUri);
+
+        return $requestUri;
+    }
+
+    /**
+     * @param $name
+     * @param $args
+     * @return void
+     */
     public function __call($name, $args)
     {
         if(\method_exists(parent::class, $name)) {
             return [parent::class, $name](...$args);
         }
-    }
-
-    /**
-     * @param array|null $files
-     * @return array|null
-     */
-    private function filterFiles(?array $files): ?array
-    {
-        if (null === $files) {
-            return null;
-        }
-
-        foreach ($files as $key => $file) {
-            if (null !== $file && ! $file->isValid()) {
-                unset($files[$key]);
-            }
-        }
-
-        return $files;
     }
 }
