@@ -15,5 +15,8 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": {
+        "symfony/http-foundation": "^5.4",
+        "tundra/support": "^1.0@beta"
+    }
 }
