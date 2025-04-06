@@ -6,6 +6,23 @@ cookie attributes, which are not supported by PHP's `setcookie()` and `setrawcoo
 Cookie headers must be sent before any other output is sent to the client.
 You can send multiple cookies.
 
+### Cookie attributes
+
+Except for `name`, all attributes are optional. The SameSite `None` attribute requires the `Secure` attribute to be set.
+
+* `name`: The name of the cookie. It must not be empty.
+* `value`: The value of the cookie. (?string)
+* `path`: The path of the cookie. If unset, defaults to `/`. (string)
+* `domain`: The domain of the cookie. (?string)
+* `expires`: The expiration date of the cookie in Unix timestamp. (int)
+* `max-age`: The maximum age of the cookie in seconds. (int)
+* `secure`: Whether the cookie should only be sent over HTTPS. (bool)
+* `httponly`: Whether the cookie should only be accessible via HTTP. (bool)
+* `samesite`: The same-site policy of the cookie. Can be `Lax`, `Strict` or `None`. (string)
+* `partitioned`: Whether the cookie is partitioned. (bool)
+
+### Using the `Tundra\Http\Cookie`
+
 Create a new cookie:
 ```php
 $cookie = new Cookie("cookie_name", "cookie_value");
@@ -46,10 +63,12 @@ If you want to let the cookie expire without sending the header immediately, cal
 $handler->cookie("cookie_name", "/cookie_path", "cookie_domain")->expire();
 ```
 
-Use the `destroy()` method if you also want to get rid of the `Cookie` object:
+Use the `destroy()` method if you also want to get rid of the `Cookie` object.
+The method supports the "defer" flag:
 
 ```php
-$handler->destroy("cookie_name", "/cookie_path", "cookie_domain");
+$handler->destroy("cookie_name", "/cookie_path", "cookie_domain"); // Delete the cookie immediately
+$handler->destroy("cookie_name", "/cookie_path", "cookie_domain", true); // Let the cookie be deleted at the end of the `Cookie` lifecycle
 ```
 
 ## Tests
